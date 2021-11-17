@@ -176,13 +176,13 @@ queryDB(
 
 //TODO TABLE
 app.get("/items", (req, res) => {
-  const query = `select * from ${TODO}`;
+  const query = `SELECT * FROM ${TODO}`;
   queryAll(query, null, res);
 });
 
 app.get("/items/:id", (req, res) => {
   var values = [req.params.id];
-  const query = `select * from ${TODO} where ${ID} = $1`;
+  const query = `SELECT * FROM ${TODO} WHERE ${ID} = $1`;
   queryAll(query, values, res);
 });
 
@@ -217,7 +217,7 @@ app.patch("/items/:id", (req, res) => {
         { name: LONG_DESC },
         { name: DUE_DATE },
       ],
-      `where ${ID} = $`,
+      `WHERE ${ID} = $`,
       [id],
       req.body,
       () => res.status(200).send(`Successfully updated item with id ${id}`)
@@ -225,15 +225,22 @@ app.patch("/items/:id", (req, res) => {
   });
 });
 
+app.delete("/items/:id", (req, res) => {
+  var values = [req.params.id];
+  queryDB(`DELETE FROM ${TODO} WHERE ${ID} = $1`, values, () => {
+    res.status(200).send(`Successfully deleted item with id ${values}`);
+  });
+});
+
 //USER TABLE
 app.get("/users", (req, res) => {
-  const query = `select * from ${USERS}`;
+  const query = `SELECT * FROM ${USERS}`;
   queryAll(query, null, res);
 });
 
 app.get("/users/:id", (req, res) => {
   var values = [req.params.id];
-  const query = `select * from ${USERS} where ${ID} = $1`;
+  const query = `SELECT * FROM ${USERS} WHERE ${ID} = $1`;
   queryAll(query, values, res);
 });
 
@@ -262,7 +269,7 @@ app.patch("/users/:id", (req, res) => {
     Update(
       USERS,
       [{ name: EMAIL }, { name: FIRST_NAME }, { name: LAST_NAME }],
-      `where ${ID} = $`,
+      `WHERE ${ID} = $`,
       [id],
       req.body,
       () => res.status(200).send(`Successfully updated user with id ${id}`)
